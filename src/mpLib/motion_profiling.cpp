@@ -54,23 +54,23 @@ double CubicBezier::getCurvature(double t) {
 //   return k;
 // }
 
-Path::Path(std::initializer_list<CubicBezier> paths) : paths(paths) {}
+Spline::Spline(std::initializer_list<virtualPath *> paths) : paths(paths) {}
 
-Point2D Path::getPoint(double t) {
+Point2D Spline::getPoint(double t) {
   int index = int(t - 0.000001);
-  return this->paths[index].getPoint(t - index);
+  return this->paths[index]->getPoint(t - index);
 }
-Point2D Path::getDerivative(double t) {
+Point2D Spline::getDerivative(double t) {
   int index = int(t);
-  return this->paths[index].getDerivative(t - index);
+  return this->paths[index]->getDerivative(t - index);
 }
-Point2D Path::getSecondDerivative(double t) {
+Point2D Spline::getSecondDerivative(double t) {
   int index = int(t);
-  return this->paths[index].getSecondDerivative(t - index);
+  return this->paths[index]->getSecondDerivative(t - index);
 }
-double Path::getCurvature(double t) {
+double Spline::getCurvature(double t) {
   int index = int(t);
-  return this->paths[index].getCurvature(t - index);
+  return this->paths[index]->getCurvature(t - index);
 }
 
 ProfilePoint::ProfilePoint(double x, double y, double theta, double curvature,

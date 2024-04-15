@@ -7,7 +7,6 @@
 #include <vector>
 namespace mpLib {
 
-
 class virtualPath {
 public:
   virtual Point2D getPoint(double t) = 0;
@@ -41,9 +40,9 @@ private:
   Eigen::Matrix<double, 2, 4> second_derivative_coef;
   double curvature;
 };
-class Path : public virtualPath {
+class Spline : public virtualPath {
 public:
-  Path(std::initializer_list<CubicBezier> paths);
+  Spline(std::initializer_list<virtualPath *> paths);
   Point2D getPoint(double t);
   Point2D getDerivative(double t);
   Point2D getSecondDerivative(double t);
@@ -51,7 +50,7 @@ public:
   int getLength() { return paths.size(); }
 
 private:
-  std::vector<CubicBezier> paths;
+  std::vector<virtualPath *> paths;
 };
 
 class Constraints {

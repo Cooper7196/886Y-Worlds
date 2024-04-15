@@ -39,9 +39,10 @@ void opcontrol() {
   chassis.followPath(
       new mpLib::CubicBezier({0, 0}, {0, 36}, {0, 36}, {-36, 36}), 450, 200,
       100);
-  chassis.followPath(new mpLib::Path(
-      {mpLib::CubicBezier({0, 0}, {0, 36}, {0, 36}, {-36, 36}),
-       mpLib::CubicBezier({0, 0}, {0, 36}, {0, 36}, {-36, 36})}));
+  chassis.followPath(new mpLib::Spline(
+      {new mpLib::CubicBezier({0, 0}, {0, 36}, {0, 36}, {-36, 36}),
+       new mpLib::CubicBezier({0, 0}, {0, 36}, {0, 36}, {-36, 36})}));
+
   pros::Controller master(pros::E_CONTROLLER_MASTER);
   while (true) {
     if (master.get_digital(DIGITAL_L1)) {
