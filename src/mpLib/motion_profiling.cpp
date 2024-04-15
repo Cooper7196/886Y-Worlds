@@ -46,12 +46,31 @@ double CubicBezier::getCurvature(double t) {
   return k;
 }
 
-double CubicBezier::getCurvature(Point2D d, Point2D dd) {
-  double denominator = d.x * d.x + d.y * d.y;
-  denominator *= denominator * denominator;
-  denominator = std::sqrt(denominator);
-  double k = (d.x * dd.y - d.y * dd.x) / denominator;
-  return k;
+// double CubicBezier::getCurvature(Point2D d, Point2D dd) {
+//   double denominator = d.x * d.x + d.y * d.y;
+//   denominator *= denominator * denominator;
+//   denominator = std::sqrt(denominator);
+//   double k = (d.x * dd.y - d.y * dd.x) / denominator;
+//   return k;
+// }
+
+Path::Path(std::initializer_list<CubicBezier> paths) : paths(paths) {}
+
+Point2D Path::getPoint(double t) {
+  int index = int(t - 0.000001);
+  return this->paths[index].getPoint(t - index);
+}
+Point2D Path::getDerivative(double t) {
+  int index = int(t);
+  return this->paths[index].getDerivative(t - index);
+}
+Point2D Path::getSecondDerivative(double t) {
+  int index = int(t);
+  return this->paths[index].getSecondDerivative(t - index);
+}
+double Path::getCurvature(double t) {
+  int index = int(t);
+  return this->paths[index].getCurvature(t - index);
 }
 
 ProfilePoint::ProfilePoint(double x, double y, double theta, double curvature,
@@ -168,13 +187,13 @@ void ProfileGenerator::generateProfile(virtualPath *path,
 
   std::vector<double> cache;
 
-  while (t <= 1) {
+  while (t <= path->getLength()) {
     deriv = path->getDerivative(t);
     derivSecond = path->getSecondDerivative(t);
 
     t += dd / sqrt(deriv.x * deriv.x + deriv.y * deriv.y);
 
-    curvature = path->getCurvature(deriv, derivSecond);
+    curvature = calcCurvature(deriv, derivSecond);
     cache.push_back(curvature);
     angular_vel = vel * curvature;
     angular_accel = (angular_vel - last_angular_vel) * (vel / dd);
@@ -198,7 +217,7 @@ void ProfileGenerator::generateProfile(virtualPath *path,
   vel = 0.00001;
   last_angular_vel = 0;
   angular_accel = 0;
-  t = 1;
+  t = path->getLength();
   int i = 0;
 
   while (dist >= 0) {
