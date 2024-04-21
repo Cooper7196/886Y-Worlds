@@ -58,18 +58,34 @@ Spline::Spline(std::initializer_list<virtualPath *> paths) : paths(paths) {}
 
 Point2D Spline::getPoint(double t) {
   int index = int(t - 0.000001);
-  return this->paths[index]->getPoint(t - index);
+  if (index > this->paths.size() - 1) {
+    index = this->paths.size() - 1;
+    t = index + 1;
+  }
+  return this->paths.at(index)->getPoint(t - index);
 }
 Point2D Spline::getDerivative(double t) {
-  int index = int(t);
+  int index = int(t - 0.000001);
+  if (index > this->paths.size() - 1) {
+    index = this->paths.size() - 1;
+    t = index + 1;
+  }
   return this->paths[index]->getDerivative(t - index);
 }
 Point2D Spline::getSecondDerivative(double t) {
-  int index = int(t);
+  int index = int(t - 0.000001);
+  if (index > this->paths.size() - 1) {
+    index = this->paths.size() - 1;
+    t = index + 1;
+  }
   return this->paths[index]->getSecondDerivative(t - index);
 }
 double Spline::getCurvature(double t) {
-  int index = int(t);
+  int index = int(t - 0.000001);
+  if (index > this->paths.size() - 1) {
+    index = this->paths.size() - 1;
+    t = index + 1;
+  }
   return this->paths[index]->getCurvature(t - index);
 }
 
@@ -220,8 +236,7 @@ void ProfileGenerator::generateProfile(virtualPath *path,
   t = path->getLength();
   int i = 0;
 
-  while (dist >= 0) {
-
+  while (i < forwardPass.size()) {
     curvature = cache.back();
     cache.pop_back();
 
