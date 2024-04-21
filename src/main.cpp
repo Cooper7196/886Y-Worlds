@@ -1,13 +1,13 @@
 #include "main.h"
 #include <memory>
 
-mpLib::Chassis chassis({11, -12, 13}, {-18, 19, -20}, 15, 11, 3.25, 450, 0.15);
+mpLib::Chassis chassis({11, -12, 13}, {-18, 19, -20}, 15, 11, 3.25, 450, 0.09);
 
 pros::MotorGroup intakeMotors({14, -17});
 
 pros::adi::Pneumatics wings('A', false);
 
-mpLib::PID headingPID(5, 0, 2);
+mpLib::PID headingPID(1, 0, 0.5);
 mpLib::PID drivePID(15, 0, 0);
 
 mpLib::Constraints constraints(76, 200, 1, 200, 0, 3.25);
@@ -35,14 +35,36 @@ void autonomous() {
 
 bool isForward = true;
 void opcontrol() {
-
-  chassis.followPath(
-      new mpLib::CubicBezier({0, 0}, {0, 36}, {0, 36}, {-36, 36}), 450, 200,
-      100);
   chassis.followPath(new mpLib::Spline(
-      {new mpLib::CubicBezier({0, 0}, {0, 36}, {0, 36}, {-36, 36}),
-       new mpLib::CubicBezier({0, 0}, {0, 36}, {0, 36}, {-36, 36})}));
-
+      {new mpLib::CubicBezier({32.591, -55.288}, {32.82, -32.362},
+                              {17.919, -25.026}, {6.685, -5.539})}));
+  chassis.waitUntil(45);
+  intakeMotors.move(120);
+  chassis.waitUntilSettled();
+  chassis.followPath(new mpLib::Spline({new mpLib::CubicBezier(
+                         {5.997, -2.329}, {12.646, -16.085}, {32.362, -41.761},
+                         {30.069, -62.395})}),
+                     true);
+  chassis.waitUntil(10);
+  intakeMotors.move(50);
+  chassis.waitUntilSettled();
+  intakeMotors.move(-70);
+  chassis.turnToHeading(55, 1500);
+  pros::delay(100);
+  chassis.turnToHeading(-95, 1500);
+  chassis.followPath(new mpLib::Spline(
+      {new mpLib::CubicBezier({39.24, -58.039}, {23.192, -58.039},
+                              {23.192, -58.039}, {7.144, -58.039})}));
+  intakeMotors.move(90);
+  chassis.followPath(new mpLib::Spline({new mpLib::CubicBezier(
+                         {2.559, -58.268}, {23.421, -57.809}, {64.916, -66.063},
+                         {63.312, -26.63})}),
+                     true);
+  chassis.waitUntil(5);
+  intakeMotors.move(40);
+  chassis.waitUntilSettled();
+  // chassis.followPath(new mpLib::Spline(
+  //     {new mpLib::CubicBezier({0, 0}, {0, 8}, {0, 16}, {0, 24})}));
   pros::Controller master(pros::E_CONTROLLER_MASTER);
   while (true) {
     if (master.get_digital(DIGITAL_L1)) {
