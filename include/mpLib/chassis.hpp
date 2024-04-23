@@ -31,9 +31,10 @@ public:
   void driveToPose(Pose targetPose);
   void followPath(mpLib::virtualPath *, bool reversed = false);
   void followPath(virtualPath *path, bool reversed, double maxVel,
-                  double maxAcc, double maxDec);
-  void setConstraints(float maxVel, float maxAccel);
-  void setConstraints(float maxVel, float maxAccel, float maxDecel);
+                  double maxAcc, double maxDec, double frictionCoef);
+  void setConstraints(float maxVel, float maxAccel, float driftFriction);
+  void setConstraints(float maxVel, float maxAccel, float maxDecel,
+                      float driftFriction);
   void swingTo(float targetHeading, bool isLeft, int timeout = 100000);
   double getHeading();
 

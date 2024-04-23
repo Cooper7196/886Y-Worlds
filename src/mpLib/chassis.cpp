@@ -144,11 +144,21 @@ void Chassis::followPath(virtualPath *path, bool reversed) {
 }
 
 void Chassis::followPath(virtualPath *path, bool reversed, double maxVel,
-                         double maxAcc, double maxDec) {
+                         double maxAcc, double maxDec, double friction_coef) {
+  double curMaxVel = maxVel;
+  double curMaxAcc = maxAcc;
+  double curMaxDec = maxDec;
+  double curFriction = friction_coef;
   this->constraints->max_acc = maxAcc;
   this->constraints->max_vel = maxVel / 60 * this->wheelDiameter * M_PI;
   this->constraints->max_dec = maxDec;
+  this->constraints->friction_coef = friction_coef;
   this->followPath(path, reversed);
+  // pros::delay(20);
+  // this->constraints->max_acc = curMaxAcc;
+  // this->constraints->max_vel = curMaxVel / 60 * this->wheelDiameter * M_PI;
+  // this->constraints->max_dec = curMaxDec;
+  // this->constraints->friction_coef = curFriction;
 }
 
 void Chassis::swingTo(float targetHeading, bool isLeft, int timeout) {
@@ -248,14 +258,18 @@ void Chassis::tankVelocityCustom(int leftVel, int rightVel) {
   lastLeftVel = leftVel;
   lastRightVel = rightVel;
 }
-void Chassis::setConstraints(float maxVel, float maxAccel) {
-  constraints = new Constraints(maxVel, maxAccel, this->driftFriction, maxAccel,
-                                0, this->trackWidth);
+void Chassis::setConstraints(float maxVel, float maxAccel,
+                             float driftFriction) {
+  constraints =
+      new Constraints(maxVel / 60 * this->wheelDiameter * M_PI, maxAccel,
+                      driftFriction, maxAccel, 0, this->trackWidth);
 }
 
-void Chassis::setConstraints(float maxVel, float maxAccel, float maxDecel) {
-  constraints = new Constraints(maxVel, maxAccel, this->driftFriction, maxDecel,
-                                0, this->trackWidth);
+void Chassis::setConstraints(float maxVel, float maxAccel, float maxDecel,
+                             float driftFriction) {
+  constraints =
+      new Constraints(maxVel / 60 * this->wheelDiameter * M_PI, maxAccel,
+                      driftFriction, maxDecel, 0, this->trackWidth);
 }
 double Chassis::getHeading() { return Imu->get_heading(); }
 } // namespace mpLib
